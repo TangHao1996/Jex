@@ -1,5 +1,5 @@
-#include"log.h"
-
+//#include"log.h"
+#include"ThreadPool.h"
 
 int main(){
 

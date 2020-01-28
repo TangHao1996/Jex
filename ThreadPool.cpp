@@ -6,7 +6,7 @@ pthread_mutex_t ThreadPool::lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t ThreadPool::ThreadPool::wait_task_cond = PTHREAD_COND_INITIALIZER;
 bool ThreadPool::shutdown = false;
 std::vector<pthread_t> ThreadPool::threads;
-std::queue<task*> ThreadPool::task_queue;
+std::queue<task_t> ThreadPool::task_queue;
 int ThreadPool::ThreadPool::m_queue_size = 0;
 
 
@@ -76,9 +76,23 @@ int ThreadPool::destroy(){
 }
 
 void* ThreadPool::thread_process(void *args){
-	if(shutdown)
-		return NULL;
-
+	while(true){
+		task_t task;
+		pthread_mutex_lock(&lock);
+		if(shutdown)
+			return NULL;
+		while(task_queue.empty() && !shutdown){
+			pthread_cond_wait(&wait_task_cond, &lock);//解锁等待
+		}
+		//返回加锁
+		task.func = task_queue.front().func;
+		task.args = task_queue.front().args;
+		task_queue.pop();
+		pthread_mutex_unlock(&lock);
+		(*(task.func))(task.args);
+	}
+	pthread_mutex_unlock(&lock);
+	pthread_exit(NULL);
 	return NULL;
 }
 

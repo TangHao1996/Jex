@@ -11,7 +11,7 @@ const int MAX_THREADS = 1024;
 const int MIN_THREADS = 8;
 const int THREAD_STEP = 8;
 
-struct task{
+struct task_t{
 	void (*func)(void *);
 	void *args;
 };
@@ -24,7 +24,7 @@ private:
 	static bool shutdown; 
 
 	static std::vector<pthread_t> threads;
-	static std::queue<task*> task_queue;
+	static std::queue<task_t> task_queue;
 	static int m_queue_size;
 
 	static void *thread_process(void *args);
