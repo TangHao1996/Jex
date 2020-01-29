@@ -24,7 +24,7 @@ private:
 	static bool shutdown; 
 
 	static std::vector<pthread_t> threads;
-	static std::queue<task_t> task_queue;
+	static std::queue<task_t*> task_queue;
 	static int m_queue_size;
 
 	static void *thread_process(void *args);
@@ -32,6 +32,7 @@ public:
 	static int create(int num_threads, int task_queue_size);
 	static int add_threads(int add_num);
 	static int destroy();
+	static int append_task(task_t* task);
 };
 
 	
