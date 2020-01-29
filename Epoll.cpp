@@ -41,6 +41,7 @@ void Epoll::poll(){
 		int req_count = epoll_wait(epollfd, &*req_events.begin(), req_events.size(), wait_time);
 		if(req_count < 0)
 			perror("epoll wait error");
+		return;
 	}
 }
 
