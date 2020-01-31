@@ -1,3 +1,4 @@
 *.o
 run
 *.swp
+*.cpp_
