@@ -25,6 +25,7 @@ void Epoll::epoll_add(int fd, epoll_event* event){
 }
 
 void Epoll::epoll_modify(int fd, epoll_event* event){
+	(*event).data.fd = fd;
 	if(epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, event) < 0){
 		perror("epoll mod error");
 	}
