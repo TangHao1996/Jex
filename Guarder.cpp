@@ -7,14 +7,15 @@ namespace Jex{
 
 Guarder::Guarder(int port)
 	:listenfd(create_listenfd(port)),
-	m_poll(new Epoll(-1)){
+	m_poll(new Epoll(EPOLL_TIME_INF)),
+	listen_req(new Request(-1, 0, NULL)){
 	
-	epoll_event event;
-	event.events = (EPOLLIN | EPOLLET);//检测输入请求，边沿检测
-	event.data.fd = listenfd;			//回调函数入口放在Request类中
-	m_poll->epoll_add(listenfd, &event);//epoll
+ 	listen_req->setfd(listenfd);
+	listen_req->set_epoll_req(EPOLLIN | EPOLLET);
+	listen_req->set_handler(NULL);//NEED TO IMPL
+	m_poll->epoll_add(listen_req);//epoll
 }
-
+ 
 Guarder::~Guarder(){
 
 }

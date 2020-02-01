@@ -3,6 +3,7 @@
 #include <memory>
 #include "ThreadPool.h"
 #include "Epoll.h"
+#include "Request.h"
 
 namespace Jex {
 
@@ -15,6 +16,7 @@ private:
 	int listenfd;
 	int port;
 	std::shared_ptr<Epoll> m_poll;
+	Request::ptr listen_req;
 };
 
 
