@@ -12,12 +12,12 @@ namespace Jex{
 
 class Epoll{
 private:
-	static const int MAXFDS = 10000;
 	int epollfd;
 	std::vector<epoll_event> ready_events;
 	int wait_time;
 public:
 	typedef std::shared_ptr<Epoll> ptr;
+	static const int MAX_REQS;	
 
 	Epoll(int time = -1);
 	~Epoll();

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <memory>
+#include <functional>
 
 namespace Jex{
 
@@ -9,9 +10,10 @@ class Request {
 public:
 	typedef std::shared_ptr<Request> ptr;
 	typedef __uint32_t epoll_req_t;//epoll_event.events
-	typedef void(*Callback_ptr_t)();//回调函数指针
+	typedef std::function<void()> Callback_ptr_t;//回调函数指针
 
 	Request(int fd, epoll_req_t events, Callback_ptr_t func);
+	Request();
 	~Request();
 
 	int getfd() {return m_fd;}

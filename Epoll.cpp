@@ -5,7 +5,7 @@
 
 namespace Jex {
 
-const int MAX_REQS = 4096;
+const int Epoll::MAX_REQS = 4096;
 
 Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)), ready_events(MAX_REQS), wait_time(time) {
 	if(epollfd <= 0){
