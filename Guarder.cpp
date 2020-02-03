@@ -2,6 +2,7 @@
 #include "Util.h"
 #include <sys/socket.h>
 #include "Request.h"
+#include <cstring>
 
 namespace Jex{
 
@@ -12,7 +13,7 @@ Guarder::Guarder(int port)
 	
  	listen_req->setfd(listenfd);
 	listen_req->set_epoll_req(EPOLLIN | EPOLLET);
-	listen_req->set_handler(NULL);//NEED TO IMPL
+	listen_req->set_handler(&connect_handler);//connect to new client
 	m_poll->epoll_add(listen_req);//epoll
 }
  
@@ -24,5 +25,18 @@ void Guarder::loop(){
 	
 }
 
+void Guarder::connect_handler(){
+	struct sockaddr_in client_addr;
+	memset(&client_addr, 0, sizeof(client_addr));
+	socklen_t client_addr_len = sizeof(client_addr);
+	int accept_fd = 0;
+
+	if(accept_fd = accept(listenfd, (struct sockaddr *)&client_addr), &client_addr_len) == -1 ){
+		perror("accept error");
+		return;
+	}
+	
+	
+}
 
 }

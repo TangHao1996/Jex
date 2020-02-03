@@ -10,7 +10,7 @@ LIBS := -lpthread
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	g++ $(FLAFS) -o $@ $^ $(LIBS)
+	g++ $(FLAGS) -o $@ $^ $(LIBS)
 
 %o: %cpp
 	g++ $(FLAGS) -c $@ $< $(LIBS)

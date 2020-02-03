@@ -7,7 +7,7 @@ namespace Jex {
 
 const int MAX_REQS = 4096;
 
-Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)), req_events(MAX_REQS), wait_time(time) {
+Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)), ready_events(MAX_REQS), wait_time(time) {
 	if(epollfd <= 0){
 		perror("epoll create error");
 	}
@@ -46,12 +46,11 @@ void Epoll::epoll_delete(Request::ptr req, Request::epoll_req_t events){
 
 void Epoll::poll(){
 	while(true){
-		int req_count = epoll_wait(epollfd, &*req_events.begin(), req_events.size(), wait_time);
+		int req_count = epoll_wait(epollfd, &*ready_events.begin(), ready_events.size(), wait_time);
 		if(req_count < 0)
 			perror("epoll wait error");
 		return;
 	}
 }
-
 
 }

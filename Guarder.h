@@ -11,12 +11,19 @@ class Guarder{
 public:
 	Guarder(int port);
 	~Guarder();
+
+	void start();
 	void loop();
+	void stop();
 private:
 	int listenfd;
 	int port;
-	std::shared_ptr<Epoll> m_poll;
+	Epoll::ptr m_poll;
 	Request::ptr listen_req;
+	std::vector<Request::ptr> all_req;
+	bool quit;
+
+	void connect_handler();
 };
 
 
