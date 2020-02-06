@@ -4,6 +4,7 @@
 #include "Request.h"
 #include <cstring>
 #include <netinet/ip.h>
+#include <iostream>
 
 namespace Jex{
 
@@ -23,8 +24,20 @@ Guarder::~Guarder(){
 
 }
 
-void Guarder::loop(){
+void Guarder::start(){
+	quit = false;
+}
+
+void Guarder::stop(){
+	quit = true;
+}
+
+void Guarder::loop(){//IMPL
 	
+	std::vector<Request::ptr> ready_requests;
+	while(!quit){
+		m_poll->poll();
+	}
 }
 
 void Guarder::connect_handler(){
@@ -37,7 +50,7 @@ void Guarder::connect_handler(){
 		perror("accept error");
 		return;
 	}
-	
+	std::cout<<"new connection"<<std::endl;
 	
 }
 

@@ -25,7 +25,7 @@ public:
 	void epoll_modify(Request::ptr req);
 	void epoll_delete(Request::ptr req, Request::epoll_req_t);
 	void poll();
-
+	void getReadyRequest(std::vector<Request::ptr> &ready_requests);
  
 };
 

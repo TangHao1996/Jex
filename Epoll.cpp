@@ -53,4 +53,8 @@ void Epoll::poll(){
 	}
 }
 
+void Epoll::getReadyRequest(std::vector<Request::ptr> &ready_requests){//IMPL
+
+}
+
 }
