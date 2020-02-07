@@ -20,7 +20,7 @@ private:
 	int port;
 	Epoll::ptr m_poll;
 	Request::ptr listen_req;
-	std::vector<Request::ptr> all_req;
+	//std::vector<Request::ptr> all_req;
 	bool quit;
 
 	void connect_handler();

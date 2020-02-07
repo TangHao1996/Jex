@@ -14,6 +14,7 @@ class Epoll{
 private:
 	int epollfd;
 	std::vector<epoll_event> ready_events;
+	std::vector<Request::ptr> all_req;//use fd as index to request
 	int wait_time;
 public:
 	typedef std::shared_ptr<Epoll> ptr;
@@ -24,8 +25,8 @@ public:
 	void epoll_add(Request::ptr req);
 	void epoll_modify(Request::ptr req);
 	void epoll_delete(Request::ptr req, Request::epoll_req_t);
-	void poll();
-	void getReadyRequest(std::vector<Request::ptr> &ready_requests);
+	int poll();
+	void getReadyRequest(std::vector<Request::ptr> &ready_requests, int events_cnt);
  
 };
 
