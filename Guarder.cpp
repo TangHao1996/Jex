@@ -20,7 +20,7 @@ Guarder::Guarder(int port)
 }
  
 Guarder::~Guarder(){
-
+	std::cout<<"server destroied."<<std::endl;
 }
 
 void Guarder::start(){

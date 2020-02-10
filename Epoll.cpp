@@ -61,12 +61,13 @@ void Epoll::epoll_delete(Request::ptr req, Request::epoll_req_t events){
 
 int Epoll::poll(){
 	int req_count = 0;
-	while(true){
-		req_count = epoll_wait(epollfd, &*ready_events.begin(), ready_events.size(), wait_time);
-		if(req_count < 0)
-			perror("epoll wait error");
+	//while(true){
+	req_count = epoll_wait(epollfd, &*ready_events.begin(), ready_events.size(), wait_time);
+	if(req_count < 0){
+		perror("epoll wait error");
 		return -1;
 	}
+	//}
 	return req_count;
 }
 
