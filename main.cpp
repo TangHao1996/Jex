@@ -7,6 +7,7 @@ using namespace Jex;
 int main(){
 
 	Guarder test_server(8888);
+	ThreadPool::create(8, 1000);
 	test_server.start();
 	test_server.loop();
 

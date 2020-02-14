@@ -8,7 +8,7 @@ pthread_cond_t ThreadPool::ThreadPool::wait_task_cond = PTHREAD_COND_INITIALIZER
 bool ThreadPool::shutdown = false;
 std::vector<pthread_t> ThreadPool::threads;
 std::queue<std::function<void()>> ThreadPool::task_queue;
-int ThreadPool::ThreadPool::m_queue_size = 0;
+unsigned int ThreadPool::ThreadPool::m_queue_size = 0;
 
 void thread_handle(Request::ptr req){
 	req->handle_epoll();
@@ -28,7 +28,7 @@ int ThreadPool::create(int num_threads, int queue_size){
 			return 0;
 
 		pthread_t thread_;
-		if(pthread_create(&thread_, NULL,thread_process, (void *)(0)) != 0){
+		if(pthread_create(&thread_, NULL, thread_process, (void *)(0)) != 0){
 			perror("thread create error");
 			return -1;
 		}
@@ -64,7 +64,7 @@ int ThreadPool::destroy(){
 		return -1;
 	}
 
-	for(int i=0; i<threads.size(); i++){
+	for(int i=0; i < (int)threads.size(); i++){
 		if(pthread_join(threads[i], NULL) != 0){
 			perror("thread join error");
 			return -1;
@@ -80,11 +80,19 @@ int ThreadPool::destroy(){
 
 int ThreadPool::append_task(Request::ptr req){
 	
-	if(req){
+	if(req && !shutdown){
+		if(task_queue.size() > m_queue_size)
+			return -1;
+
 		pthread_mutex_lock(&lock);
 		auto task = std::bind(&(thread_handle), req);
 		task_queue.push(task);
 		pthread_mutex_unlock(&lock);
+
+		if(pthread_cond_signal(&wait_task_cond) != 0){
+			perror("cond signal error");
+			return -1;
+		}
 	} 
 	else
 		return -1;

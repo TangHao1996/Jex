@@ -28,7 +28,7 @@ private:
 
 	static std::vector<pthread_t> threads;
 	static std::queue<std::function<void()>> task_queue;
-	static int m_queue_size;
+	static unsigned int m_queue_size;
 
 	static void *thread_process(void *args);
 public:

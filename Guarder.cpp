@@ -2,9 +2,11 @@
 #include "Util.h"
 #include <sys/socket.h>
 #include "Request.h"
+#include "ThreadPool.h"
 #include <cstring>
 #include <netinet/ip.h>
 #include <iostream>
+
 
 namespace Jex{
 
@@ -31,7 +33,7 @@ void Guarder::stop(){
 	quit = true;
 }
 
-void Guarder::loop(){//IMPL
+void Guarder::loop(){
 	
 	std::vector<Request::ptr> ready_requests;
 	while(!quit){
@@ -39,7 +41,9 @@ void Guarder::loop(){//IMPL
 		m_poll->getReadyRequest(ready_requests, ready_cnt);
 
 		for(auto& it : ready_requests){
-			it->handle_epoll();
+			if(ThreadPool::append_task(it) == -1){
+				std::cout<<"task append error"<<std::endl;
+			}
 		}
 	}
 }
@@ -54,7 +58,7 @@ void Guarder::connect_handler(){
 		perror("accept error");
 		return;
 	}
-	std::cout<<"new connection"<<std::endl;
+	std::cout<<"new connection handled by thread "<<(int)pthread_self()<<std::endl;
 	
 }
 
