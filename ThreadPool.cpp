@@ -7,10 +7,12 @@ pthread_mutex_t ThreadPool::lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t ThreadPool::ThreadPool::wait_task_cond = PTHREAD_COND_INITIALIZER;
 bool ThreadPool::shutdown = false;
 std::vector<pthread_t> ThreadPool::threads;
-std::queue<task_t*> ThreadPool::task_queue;
+std::queue<std::function<void()>> ThreadPool::task_queue;
 int ThreadPool::ThreadPool::m_queue_size = 0;
 
-
+void thread_handle(Request::ptr req){
+	req->handle_epoll();
+}
 
 int ThreadPool::create(int num_threads, int queue_size){
 	int num = 0;
@@ -76,14 +78,22 @@ int ThreadPool::destroy(){
 	return 0;
 }
 
-int ThreadPool::append_task(task_t* task){
-	if(!task)
+int ThreadPool::append_task(Request::ptr req){
+	
+	if(req){
+		pthread_mutex_lock(&lock);
+		auto task = std::bind(&(thread_handle), req);
 		task_queue.push(task);
+		pthread_mutex_unlock(&lock);
+	} 
+	else
+		return -1;
+
+	return 0;
 }
 
 void* ThreadPool::thread_process(void *args){
 	while(true){
-		task_t task;
 		pthread_mutex_lock(&lock);
 		if(shutdown)
 			return NULL;
@@ -91,11 +101,10 @@ void* ThreadPool::thread_process(void *args){
 			pthread_cond_wait(&wait_task_cond, &lock);//解锁等待
 		}
 		//返回加锁
-		task.func = task_queue.front()->func;
-		task.args = task_queue.front()->args;
+		auto task = task_queue.front();
 		task_queue.pop();
 		pthread_mutex_unlock(&lock);
-		(*(task.func))(task.args);
+		task();
 	}
 	pthread_mutex_unlock(&lock);
 	pthread_exit(NULL);
