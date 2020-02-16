@@ -8,6 +8,7 @@
 
 namespace Jex{
 
+const int MAX_READ_BUFF = 4096;	
 
 int create_listenfd(int port){
 	if(port < 0 || port > 65535)
@@ -39,6 +40,28 @@ int create_listenfd(int port){
 
 
 	return listenfd;
+}
+
+ssize_t readn(int fd, std::string &inBuffer, bool &ifend){
+	ssize_t nread = 0;
+	ssize_t readSum = 0;
+
+	while(true){
+		char buff_[MAX_READ_BUFF];
+		if((nread = read(fd, buff_, MAX_READ_BUFF)) < 0){
+			perror("read buffer error");
+			return -1;
+		}else if(nread == 0){
+			ifend = true;
+			break;
+		}
+
+		readSum += nread;
+		inBuffer += std::string(buff_, buff_ + nread);
+	}
+
+
+	return readSum;
 }
 
 }
