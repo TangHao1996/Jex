@@ -4,6 +4,7 @@
 #include "ThreadPool.h"
 #include "Epoll.h"
 #include "Request.h"
+#include "HttpSession.h"
 
 namespace Jex {
 

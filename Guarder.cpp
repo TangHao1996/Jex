@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include "Request.h"
 #include "ThreadPool.h"
+#include "HttpSession.h"
 #include <cstring>
 #include <netinet/ip.h>
 #include <iostream>
@@ -13,11 +14,11 @@ namespace Jex{
 Guarder::Guarder(int port)
 	:listenfd(create_listenfd(port)),
 	m_poll(new Epoll(EPOLL_TIME_INF)),
-	listen_req(new Request(-1, 0, NULL)){
+	listen_req(new Request()){
 	
  	listen_req->setfd(listenfd);
 	listen_req->set_epoll_event(EPOLLIN | EPOLLET);
-	listen_req->set_handler(std::bind(&Guarder::connect_handler, this));//connect to new client
+	listen_req->set_read_handler(std::bind(&Guarder::connect_handler, this));//connect to new client
 	m_poll->epoll_add(listen_req);//epoll
 }
  
@@ -59,7 +60,12 @@ void Guarder::connect_handler(){
 		return;
 	}
 	std::cout<<"new connection handled by thread "<<(int)pthread_self()<<std::endl;
-	
+	Request::ptr req(new Request());
+	req->setfd(accept_fd);
+	req->set_epoll_event(EPOLLIN | EPOLLET);
+	m_poll->epoll_add(req);
+	HttpSession::ptr sess(new HttpSession());
+	req->bind_session(sess);
 }
 
 }

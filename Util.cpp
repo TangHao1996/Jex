@@ -42,7 +42,8 @@ int create_listenfd(int port){
 	return listenfd;
 }
 
-ssize_t readn(int fd, std::string &inBuffer, bool &ifend){
+
+ssize_t readn(int fd, std::string &inBuffer){
 	ssize_t nread = 0;
 	ssize_t readSum = 0;
 
@@ -52,7 +53,6 @@ ssize_t readn(int fd, std::string &inBuffer, bool &ifend){
 			perror("read buffer error");
 			return -1;
 		}else if(nread == 0){
-			ifend = true;
 			break;
 		}
 
