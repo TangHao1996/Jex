@@ -25,7 +25,7 @@ public:
 	void setfd(int fd) {m_fd = fd;}
 	void set_epoll_event(epoll_req_t epoll_event){m_event = epoll_event;}
 	void set_ready_event(epoll_req_t event){m_ready_event = event;}
-	void bind_session(HttpSession::ptr& sess);
+	void bind_session(HttpSession::ptr sess);
 
 	void handle_epoll();
 

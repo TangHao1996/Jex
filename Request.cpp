@@ -1,6 +1,7 @@
 #include "Request.h"
 #include <sys/epoll.h>
 #include <functional>
+#include <iostream>
 
 namespace Jex{
 
@@ -20,7 +21,7 @@ Request::~Request(){
 
 }
 
-void Request::bind_session(HttpSession::ptr& sess){
+void Request::bind_session(HttpSession::ptr sess){
 	set_read_handler(std::bind(&handle_sess_read, sess));
 	set_write_handler(std::bind(&handle_sess_write, sess));
 	sess->setfd(m_fd);

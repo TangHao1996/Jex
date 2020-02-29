@@ -13,7 +13,8 @@ namespace Jex{
 
 Guarder::Guarder(int port)
 	:listenfd(create_listenfd(port)),
-	m_poll(new Epoll(EPOLL_TIME_INF)),
+	//m_poll(new Epoll(EPOLL_TIME_INF)),
+	m_poll(new Epoll(3000)),
 	listen_req(new Request()){
 	
  	listen_req->setfd(listenfd);
@@ -36,8 +37,8 @@ void Guarder::stop(){
 
 void Guarder::loop(){
 	
-	std::vector<Request::ptr> ready_requests;
 	while(!quit){
+		std::vector<Request::ptr> ready_requests;
 		int ready_cnt = m_poll->poll();
 		m_poll->getReadyRequest(ready_requests, ready_cnt);
 
@@ -55,17 +56,18 @@ void Guarder::connect_handler(){
 	socklen_t client_addr_len = sizeof(client_addr);
 	int accept_fd = 0;
 
-	if(accept_fd = accept(listenfd, (struct sockaddr *)&client_addr, &client_addr_len) == -1 ){
+	if((accept_fd = accept(listenfd, (struct sockaddr *)&client_addr, &client_addr_len)) == -1 ){
 		perror("accept error");
 		return;
 	}
-	std::cout<<"new connection handled by thread "<<(int)pthread_self()<<std::endl;
+	std::cout<<"new connnection, fd:  "<<accept_fd<<std::endl;
 	Request::ptr req(new Request());
 	req->setfd(accept_fd);
 	req->set_epoll_event(EPOLLIN | EPOLLET);
-	m_poll->epoll_add(req);
+	setNonBlocking(accept_fd); //set non-blocking io
 	HttpSession::ptr sess(new HttpSession());
 	req->bind_session(sess);
+	m_poll->epoll_add(req);
 }
 
 }

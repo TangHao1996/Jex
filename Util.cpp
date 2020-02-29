@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <strings.h>
+#include <fcntl.h>
 
 namespace Jex{
 
@@ -42,6 +43,19 @@ int create_listenfd(int port){
 	return listenfd;
 }
 
+void setNonBlocking(int fd){
+	int old_flag = fcntl(fd, F_GETFL, 0);
+	if(old_flag == -1){
+		printf("get fd flag failed.\n");
+		return;
+	}
+	int flag = old_flag | O_NONBLOCK;
+	if(fcntl(fd, F_SETFL, flag) == -1){
+		printf("set fd flag failed.\n");
+		return;
+	}
+
+}
 
 ssize_t readn(int fd, std::string &inBuffer){
 	ssize_t nread = 0;
@@ -50,8 +64,17 @@ ssize_t readn(int fd, std::string &inBuffer){
 	while(true){
 		char buff_[MAX_READ_BUFF];
 		if((nread = read(fd, buff_, MAX_READ_BUFF)) < 0){
-			perror("read buffer error");
-			return -1;
+			if(errno == EINTR){//若只是被中断打断则继续
+				//perror("");
+				continue;
+			}
+			else if(errno == EAGAIN){
+				return readSum;
+			}
+			else{
+				perror("read buffer error");
+				return -1;
+			}
 		}else if(nread == 0){
 			break;
 		}

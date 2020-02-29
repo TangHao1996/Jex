@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <iostream>
 
 namespace Jex {
 
@@ -9,7 +10,7 @@ const int Epoll::MAX_REQS = 4096;
 
 Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)), 
 	ready_events(MAX_REQS),
-	all_req(MAX_REQS),
+	all_req(MAX_REQS, NULL),
 	wait_time(time) {
 	if(epollfd <= 0){
 		perror("epoll create error");
@@ -21,6 +22,10 @@ Epoll::~Epoll(){
 }
 
 void Epoll::epoll_add(Request::ptr req){
+	if(all_req[req->getfd()] != NULL){
+		printf("connected aleady.\n");
+		return;
+	}
 	struct epoll_event event;
 	event.data.fd = req->getfd();
 	event.events = req->get_epoll_events();
@@ -30,6 +35,7 @@ void Epoll::epoll_add(Request::ptr req){
 	}
 
 	all_req[req->getfd()] = req;
+	std::cout<<"new fd added: "<<req->getfd()<<std::endl;
 }
 
 void Epoll::epoll_modify(Request::ptr req){
@@ -68,6 +74,7 @@ int Epoll::poll(){
 		return -1;
 	}
 	//}
+	//std::cout<<"number of ready request: "<<req_count<<std::endl;
 	return req_count;
 }
 
