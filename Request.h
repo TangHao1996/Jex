@@ -32,6 +32,7 @@ public:
 	void bind_session(HttpSession::ptr sess);
 
 	void handle_epoll();
+	void mod_event();
 
 private:
 	int m_fd;

@@ -43,4 +43,11 @@ void Request::handle_epoll(){
 	}
 }
 
+void Request::mod_event(){
+	
+}
+
+
+
+
 }

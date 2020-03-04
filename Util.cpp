@@ -87,4 +87,38 @@ ssize_t readn(int fd, std::string &inBuffer){
 	return readSum;
 }
 
+ssize_t writen(int fd, std::string &outBuffer){
+  size_t nleft = outBuffer.size();
+  ssize_t nwritten = 0;
+  ssize_t writeSum = 0;
+  const char *ptr = outBuffer.c_str();
+  while (nleft > 0) {
+    if ((nwritten = write(fd, ptr, nleft)) <= 0) {
+      if (nwritten < 0) {
+        if (errno == EINTR) {
+          nwritten = 0;
+          continue;
+        } else if (errno == EAGAIN)
+          break;
+        else
+          return -1;
+      }
+    }
+    writeSum += nwritten;
+    nleft -= nwritten;
+    ptr += nwritten;
+  }
+  if (writeSum == static_cast<int>(outBuffer.size()))
+    outBuffer.clear();
+  else
+    outBuffer = outBuffer.substr(writeSum);
+  return writeSum;
+}
+
+
+
+
+
+
+
 }

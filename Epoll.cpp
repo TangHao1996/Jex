@@ -38,9 +38,8 @@ void Epoll::epoll_add(Request::ptr req){
 	std::cout<<"new fd added: "<<req->getfd()<<std::endl;
 }
 
-void Epoll::epoll_modify(Request::ptr req){
+void Epoll::epoll_modify(int fd, __uint32_t events){
 
-	int fd = req->getfd();
 	if(all_req[fd] == nullptr){
 		perror("can't modify null epoll Request");
 		return;
@@ -48,11 +47,11 @@ void Epoll::epoll_modify(Request::ptr req){
 
 	struct epoll_event event;
 	event.data.fd = fd;
-	event.events = req->get_epoll_events();
+	event.events = events;
 	if(epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event) < 0){
 		perror("epoll mod error");
 	}
-	all_req[req->getfd()] = req;
+	all_req[fd]->set_epoll_event(events);
 }
 
 void Epoll::epoll_delete(Request::ptr req, Request::epoll_req_t events){

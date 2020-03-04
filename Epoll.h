@@ -23,7 +23,7 @@ public:
 	Epoll(int time = -1);
 	~Epoll();
 	void epoll_add(Request::ptr req);
-	void epoll_modify(Request::ptr req);
+	void epoll_modify(int fd, __uint32_t events);
 	void epoll_delete(Request::ptr req, Request::epoll_req_t);
 	int poll();
 	void getReadyRequest(std::vector<Request::ptr> &ready_requests, int events_cnt);

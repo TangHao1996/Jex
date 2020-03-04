@@ -64,12 +64,12 @@ void HttpSession::readHandler(){
 		errorHandler();
 		return;
 	}
-		
+	writeHandler();	
 
 }
 
 void HttpSession::writeHandler(){
-
+	writen(m_epoll_fd, outBuffer);
 }
 
 void HttpSession::errorHandler(){
