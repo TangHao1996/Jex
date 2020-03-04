@@ -18,12 +18,13 @@ Request::Request() : m_fd(-1), m_event(0),m_ready_event(0), m_read_handler(NULL)
 }
 
 Request::~Request(){
-
+	std::cout<<"distruct request, fd: "<<m_fd<<std::endl;
 }
 
 void Request::bind_session(HttpSession::ptr sess){
 	set_read_handler(std::bind(&handle_sess_read, sess));
 	set_write_handler(std::bind(&handle_sess_write, sess));
+	m_sess = sess;
 	sess->setfd(m_fd);
 }
 

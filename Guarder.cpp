@@ -21,10 +21,11 @@ Guarder::Guarder(int port)
 	listen_req->set_epoll_event(EPOLLIN | EPOLLET);
 	listen_req->set_read_handler(std::bind(&Guarder::connect_handler, this));//connect to new client
 	m_poll->epoll_add(listen_req);//epoll
+	listen_req->set_epoll(m_poll);
 }
  
 Guarder::~Guarder(){
-	std::cout<<"server destroied."<<std::endl;
+	std::cout<<"server quit."<<std::endl;
 }
 
 void Guarder::start(){
@@ -68,6 +69,7 @@ void Guarder::connect_handler(){
 	HttpSession::ptr sess(new HttpSession());
 	req->bind_session(sess);
 	m_poll->epoll_add(req);
+	req->set_epoll(m_poll);
 }
 
 }

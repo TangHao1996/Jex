@@ -18,7 +18,7 @@ Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)),
 }
 
 Epoll::~Epoll(){
-
+	std::cout<<"epoll quit."<<std::endl;
 }
 
 void Epoll::epoll_add(Request::ptr req){
