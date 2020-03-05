@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <iostream>
+#include <unistd.h>
 
 namespace Jex {
 
@@ -41,7 +42,7 @@ void Epoll::epoll_add(Request::ptr req){
 void Epoll::epoll_modify(int fd, __uint32_t events){
 
 	if(all_req[fd] == nullptr){
-		perror("can't modify null epoll Request");
+		std::cout<<"can't modify null epoll Request\n";
 		return;
 	}
 
@@ -54,14 +55,19 @@ void Epoll::epoll_modify(int fd, __uint32_t events){
 	all_req[fd]->set_epoll_event(events);
 }
 
-void Epoll::epoll_delete(Request::ptr req, Request::epoll_req_t events){
+void Epoll::epoll_delete(int fd){
+	if(all_req[fd] == nullptr){
+		std::cout<<"cannot delete null epoll Request\n";
+		return;
+	}
 	struct epoll_event event;
-	event.data.fd = req->getfd();
-	event.events = events;
-	if(epoll_ctl(epollfd, EPOLL_CTL_DEL, req->getfd(), &event) < 0){
+	event.data.fd = fd;
+	event.events = all_req[fd]->get_epoll_events();
+	if(epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &event) < 0){
 		perror("epoll delete error");
 	}
-	all_req[req->getfd()] = nullptr;
+	all_req[fd] = nullptr;
+	close(fd);
 }
 
 int Epoll::poll(){

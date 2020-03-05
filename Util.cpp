@@ -72,7 +72,7 @@ ssize_t readn(int fd, std::string &inBuffer){
 				return readSum;
 			}
 			else{
-				perror("read buffer error");
+				perror("readn error");
 				return -1;
 			}
 		}else if(nread == 0){
@@ -100,8 +100,10 @@ ssize_t writen(int fd, std::string &outBuffer){
           continue;
         } else if (errno == EAGAIN)
           break;
-        else
+        else{
+		perror("writen error");
           return -1;
+		}
       }
     }
     writeSum += nwritten;

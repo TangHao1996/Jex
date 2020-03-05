@@ -2,6 +2,7 @@
 #include <sys/epoll.h>
 #include <functional>
 #include <iostream>
+#include "Epoll.h"
 
 namespace Jex{
 
@@ -41,10 +42,17 @@ void Request::handle_epoll(){
 		if(m_write_handler)
 			m_write_handler();
 	}
+	//mod_event();
 }
 
 void Request::mod_event(){
-	
+	std::shared_ptr<Epoll> poll_ = m_poll.lock();
+	if(m_ready_event & (EPOLLIN | EPOLLPRI | EPOLLRDHUP))
+		poll_->epoll_modify(m_fd, EPOLLOUT|EPOLLET);
+	else if(m_ready_event & EPOLLOUT){
+		poll_->epoll_modify(m_fd, EPOLLIN|EPOLLET);
+	}
+	m_ready_event = __uint32_t(0);
 }
 
 
