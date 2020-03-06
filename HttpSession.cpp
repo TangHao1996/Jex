@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
 
 enum Header_stage{
 	H_KEY_START = 1,
@@ -293,7 +296,7 @@ int HttpSession::prepare(){
 		outBuffer += "HTTP/1.1 200 OK\r\n";
 		std::cout<<"file: "<<m_filename<<std::endl;
 		//icon
-		if(m_filename == "favicon.ico") {
+		if(m_filename == "favicon.ico1") {
 			outBuffer += "Content-Type: image/png\r\n";
 			outBuffer += "Content-Length: " + std::to_string(sizeof favicon) + "\r\n";
 			outBuffer += "Server: jextest\n";
@@ -303,10 +306,6 @@ int HttpSession::prepare(){
 			return 1;
 		}
 
-		if(m_headers["Connection"]== "Keep-Alive" || m_headers["Connection"] == "keep-alive"){
-			outBuffer += "Connection: Keep-Alive\r\n";
-			outBuffer += "Keep-Alive: timeout=3000\r\n";
-		}
 		if(m_filename == "helloworld" || m_filename == "index.html"){
 			outBuffer += "Content-type: text/plain\r\n";
 			outBuffer += "Content-Length: 11\r\n";//不加length的后果是浏览器会一直读直到连接断开
@@ -315,12 +314,64 @@ int HttpSession::prepare(){
 			return 1;
 		}
 
-		std::string filetype;
+		if(m_headers["Connection"]== "Keep-Alive" || m_headers["Connection"] == "keep-alive"){
+			outBuffer += "Connection: Keep-Alive\r\n";
+			outBuffer += "Keep-Alive: timeout=3000\r\n";
+		}
+
 		struct stat file_;
 		if (stat(m_filename.c_str(), &file_) < 0) {
+			perror("stat error");
    			outBuffer.clear();
       		return -1;
     	}
+
+		std::string filetype = "text/plain";
+		int dot_pos = m_filename.find('.');
+		if(dot_pos >= 0){
+			std::string type_ = m_filename.substr(dot_pos);
+			if(type_ == ".html" || type_ == ".htm")
+				filetype = "text/html";
+			else if(type_ == ".avi")
+				filetype = "video/x-msvideo";
+			else if(type_ == ".bmp")
+				filetype = "image/bmp";
+			else if(type_ == ".ico")
+				filetype = "image/x-icon";
+			else if(type_ == ".jpg")
+				filetype = "image/jpeg";
+			else if(type_ == ".png")
+				filetype = "image/png";
+			else if(type_ == ".txt" || type_ == ".c")
+				filetype = "text/plain";
+			else if(type_ == ".mp3")
+				filetype = "audio/mp3";
+			else
+				filetype = "text/html";
+		}
+		outBuffer += "Content-Type: " + filetype + "\r\n";
+		outBuffer += "Content-Length: " + std::to_string(file_.st_size) + "\r\n";
+		outBuffer += "Server: Jex\r\n";
+		outBuffer += "\r\n";
+
+		int src_fd = open(m_filename.c_str(), O_RDONLY, 0);
+		if(src_fd < 0){
+			perror("open file error");
+			outBuffer.clear();
+			return -1;
+		}
+		void *file_mem = mmap(NULL, file_.st_size, PROT_READ, MAP_PRIVATE, src_fd, 0);
+		close(src_fd);
+		if(reinterpret_cast<long>(file_mem) < 0){
+			perror("mmap error");
+			munmap(file_mem, file_.st_size);
+			outBuffer.clear();
+			return -1;
+		}
+		char *file_ptr = static_cast<char *>(file_mem);
+		outBuffer += std::string(file_ptr, file_ptr + file_.st_size);
+		munmap(file_mem, file_.st_size);
+		return 1;
 	}
 
 	return 1;
