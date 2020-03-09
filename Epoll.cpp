@@ -19,6 +19,7 @@ Epoll::Epoll(int time):epollfd(epoll_create1(EPOLL_CLOEXEC)),
 }
 
 Epoll::~Epoll(){
+	close(epollfd);
 	std::cout<<"epoll quit."<<std::endl;
 }
 
@@ -36,7 +37,6 @@ void Epoll::epoll_add(Request::ptr req){
 	}
 
 	all_req[req->getfd()] = req;
-	std::cout<<"new fd added: "<<req->getfd()<<std::endl;
 }
 
 void Epoll::epoll_modify(int fd, __uint32_t events){
@@ -52,7 +52,7 @@ void Epoll::epoll_modify(int fd, __uint32_t events){
 	if(epoll_ctl(epollfd, EPOLL_CTL_MOD, fd, &event) < 0){
 		perror("epoll mod error");
 	}
-	all_req[fd]->set_epoll_event(events);
+	//all_req[fd]->set_epoll_event(events);
 }
 
 void Epoll::epoll_delete(int fd){
@@ -91,7 +91,6 @@ void Epoll::getReadyRequest(std::vector<Request::ptr> &ready_requests, int event
 		
 		if(req){
 			req->set_ready_event(ready_events[i].events);
-			req->set_epoll_event(0);
 			ready_requests.push_back(req);
 		}
 		else{

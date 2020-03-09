@@ -17,6 +17,12 @@ enum HttpVersion{
 	HTTP11 = 2
 };
 
+enum HttpError{
+	DISCONNECT = 0,
+	BAD_REQUEST = 400,
+	NOT_FOUND= 404
+};
+
 enum ConnectionState{
 	CONNECTED = 0,
 	DISCONNECTED
@@ -31,8 +37,10 @@ public:
 
 	void readHandler();
 	void writeHandler();
-	void errorHandler();
+	void errorHandler(HttpError err);
 	void setfd(int fd){m_epoll_fd = fd; }
+	int get_inBuffer_size(){return inBuffer.size();}
+	int get_outBuffer_size(){return outBuffer.size();}
 
 	void reset();
 	int requestLine();

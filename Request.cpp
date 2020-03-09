@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "Epoll.h"
+#include <unistd.h>
 
 namespace Jex{
 
@@ -19,6 +20,7 @@ Request::Request() : m_fd(-1), m_event(0),m_ready_event(0), m_read_handler(NULL)
 }
 
 Request::~Request(){
+	close(m_fd);
 	std::cout<<"distruct request, fd: "<<m_fd<<std::endl;
 }
 
@@ -42,7 +44,21 @@ void Request::handle_epoll(){
 		if(m_write_handler)
 			m_write_handler();
 	}
-	//mod_event();
+	
+
+	auto poll_ = m_poll.lock();
+	if(!m_sess)
+		return;//listen request
+
+	if(m_sess->get_outBuffer_size() > 0){
+		std::cout<<m_sess->get_outBuffer_size()<<std::endl;
+		poll_->epoll_modify(m_fd, EPOLLET|EPOLLIN|EPOLLOUT);
+		m_event = EPOLLET|EPOLLIN|EPOLLOUT;
+	}
+	else{
+		poll_->epoll_modify(m_fd, EPOLLET|EPOLLIN);	
+		m_event = EPOLLET|EPOLLIN;
+	}
 }
 
 void Request::mod_event(){

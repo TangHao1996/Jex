@@ -7,7 +7,7 @@
 #include <cstring>
 #include <netinet/ip.h>
 #include <iostream>
-
+#include <unistd.h>
 
 namespace Jex{
 
@@ -25,6 +25,7 @@ Guarder::Guarder(int port)
 }
  
 Guarder::~Guarder(){
+	close(listenfd);
 	std::cout<<"server quit."<<std::endl;
 }
 
