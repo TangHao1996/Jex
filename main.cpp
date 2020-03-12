@@ -3,6 +3,7 @@
 #include "Epoll.h"
 #include "Guarder.h"
 #include "signal.h"
+#include "Log.h"
 
 using namespace Jex;
 

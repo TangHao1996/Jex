@@ -51,7 +51,6 @@ void Request::handle_epoll(){
 		return;//listen request
 
 	if(m_sess->get_outBuffer_size() > 0){
-		std::cout<<m_sess->get_outBuffer_size()<<std::endl;
 		poll_->epoll_modify(m_fd, EPOLLET|EPOLLIN|EPOLLOUT);
 		m_event = EPOLLET|EPOLLIN|EPOLLOUT;
 	}
