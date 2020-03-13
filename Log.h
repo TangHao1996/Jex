@@ -2,12 +2,16 @@
 
 #include <memory>
 #include <queue>
+#include <string>
+#include <iostream>
 #include <mutex>
 #include <condition_variable>
 #include "Util.h"
 #include <stdio.h>
 
+
 namespace Jex{
+
 
 enum BufState{
 	FREE = 1,
@@ -36,13 +40,27 @@ public:
 	typedef LogBuffer::ptr buffer_t;
 	~Logger();
 	void init();
-	void append(const char *file, int line, const char *logline, size_t len);
+	static std::shared_ptr<Logger> get_ins(const char *file, int line){
+		if(!ins){
+			ins.reset(new Logger());
+		}
+		ins->set_file_line(file, line);	
+
+		return ins;
+	}
+	void append(const char *file, int line, const char *msg);
 	static void *flush_buffer(void *ptr);
-	
+	Logger& operator <<(const char *msg){
+		append(cur_file.c_str(), cur_line, msg);
+		return *this;
+	}
+	void set_file_line(const char *file, int line){cur_file = file; cur_line = line;}
+
 private:
 	Logger();//隐藏构造函数
+	friend class std::shared_ptr<Logger>;
 	void flush_buffer_run();
-	static std::shared_ptr<Logger> logger;
+	static std::shared_ptr<Logger> ins;
 	FILE *fp;
 	std::queue<buffer_t> free_queue;
 	std::queue<buffer_t> flush_queue;
@@ -51,7 +69,16 @@ private:
 	std::mutex flush_mtx;
 	pthread_t flush_tid;
 	bool quit;
+	struct tm m_tm;
+	std::string cur_file;
+	int cur_line;
 };
+//std::shared_ptr<Logger> Logger::ins(nullptr);
+#define INIT \
+	do{ \
+		Logger::get_ins()->init(); \
+	}while(0)
 
+#define LOG (*Logger::get_ins(__FILE__, __LINE__))
 
 }
