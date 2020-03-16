@@ -27,7 +27,6 @@ public:
 	void epoll_delete(int fd);
 	int poll();
 	void getReadyRequest(std::vector<Request::ptr> &ready_requests, int events_cnt);
- 
 };
 
 

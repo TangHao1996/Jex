@@ -33,7 +33,7 @@ public:
 
 	void handle_epoll();
 	void mod_event();
-
+	bool if_disconnect(){return m_sess->if_disconnect();}
 private:
 	int m_fd;
 	epoll_req_t m_event;

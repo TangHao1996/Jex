@@ -81,6 +81,10 @@ void HttpSession::errorHandler(HttpError err){
 	inBuffer.clear();
 	outBuffer.clear();
 	
+	if(err == DISCONNECT){
+		m_cstate = DISCONNECTED;
+	}
+
 	if(err == NOT_FOUND){
 		std::string content_("<html><title>404 Not Found</title>");
 		outBuffer += "HTTP/1.1 404 Not Found!\r\n";

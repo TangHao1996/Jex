@@ -11,15 +11,15 @@ Guarder *test_server;
 
 void quit_handler(int a){
 	test_server->stop();
-	Logger::get_ins("", 0).reset();
+	//Logger::get_ins("", 0).reset();
 }
 
 int main(){
  
-  	Logger::get_ins("", 0)->init();	
-	LOG<<"log test";
+  	//Logger::get_ins("", 0)->init();	
+	//LOG<<"log test";
 	signal(SIGINT, quit_handler);	
-	test_server = new Guarder(8888);
+	test_server = new Guarder(80);
 	ThreadPool::create(8, 1000);
 	test_server->start();
 	test_server->loop();

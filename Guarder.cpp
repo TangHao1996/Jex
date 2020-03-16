@@ -45,6 +45,11 @@ void Guarder::loop(){
 		m_poll->getReadyRequest(ready_requests, ready_cnt);
 
 		for(auto& it : ready_requests){
+			if(it->getfd()!=listenfd && it->if_disconnect()){//listen_req 没有m_sess
+				int fd = it->getfd();
+				m_poll->epoll_delete(fd);
+				continue;
+			}
 			if(ThreadPool::append_task(it) == -1){
 				std::cout<<"task append error"<<std::endl;
 			}

@@ -21,7 +21,7 @@ Request::Request() : m_fd(-1), m_event(0),m_ready_event(0), m_read_handler(NULL)
 
 Request::~Request(){
 	close(m_fd);
-	std::cout<<"distruct request, fd: "<<m_fd<<std::endl;
+	std::cout<<"close request, fd: "<<m_fd<<std::endl;
 }
 
 void Request::bind_session(HttpSession::ptr sess){

@@ -24,8 +24,8 @@ enum HttpError{
 };
 
 enum ConnectionState{
-	CONNECTED = 0,
-	DISCONNECTED
+	CONNECTED = 1,
+	DISCONNECTED = -1
 };
 
 class HttpSession{
@@ -41,6 +41,7 @@ public:
 	void setfd(int fd){m_epoll_fd = fd; }
 	int get_inBuffer_size(){return inBuffer.size();}
 	int get_outBuffer_size(){return outBuffer.size();}
+	bool if_disconnect(){return (m_cstate == DISCONNECTED);}
 
 	void reset();
 	int requestLine();
@@ -51,7 +52,7 @@ private:
 	int m_epoll_fd;
 	std::string inBuffer;
 	std::string outBuffer;
-
+	//HTTP parse info
 	size_t read_cur_index;
 	HttpMethod m_method;
 	std::string m_filename;

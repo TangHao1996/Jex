@@ -58,7 +58,7 @@ public:
 
 private:
 	Logger();//隐藏构造函数
-	friend class std::shared_ptr<Logger>;
+	friend class std::shared_ptr<Logger>;//声明友元，否则智能指针无法访问私有的构造函数
 	void flush_buffer_run();
 	static std::shared_ptr<Logger> ins;
 	FILE *fp;
@@ -73,7 +73,6 @@ private:
 	std::string cur_file;
 	int cur_line;
 };
-//std::shared_ptr<Logger> Logger::ins(nullptr);
 #define INIT \
 	do{ \
 		Logger::get_ins()->init(); \
