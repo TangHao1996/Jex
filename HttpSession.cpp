@@ -20,7 +20,7 @@ enum Header_stage{
 
 namespace Jex{
 HttpSession::HttpSession(){
-
+	m_cstate = CONNECTED;
 }
 
 HttpSession::~HttpSession(){
@@ -37,9 +37,7 @@ void HttpSession::readHandler(){
 		return;
 	}
 	else if(read_num == 0){
-		m_cstate = DISCONNECTED;
 		errorHandler(DISCONNECT);
-		std::cout<<"disconnected"<<std::endl;
 		return;
 	}
 	
@@ -82,6 +80,7 @@ void HttpSession::errorHandler(HttpError err){
 	outBuffer.clear();
 	
 	if(err == DISCONNECT){
+		std::cout<<"disconnected, fd: "<<m_epoll_fd<<std::endl;
 		m_cstate = DISCONNECTED;
 	}
 

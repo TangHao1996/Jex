@@ -60,6 +60,7 @@ Logger::~Logger(){
 	if(fp){
 		fclose(fp);
 	}
+	
 }
 
 void Logger::init(){

@@ -7,11 +7,12 @@
 
 using namespace Jex;
 
-Guarder *test_server;
+Guarder::ptr test_server;
 
 void quit_handler(int a){
 	test_server->stop();
 	//Logger::get_ins("", 0).reset();
+	ThreadPool::destroy();
 }
 
 int main(){
@@ -19,11 +20,11 @@ int main(){
   	//Logger::get_ins("", 0)->init();	
 	//LOG<<"log test";
 	signal(SIGINT, quit_handler);	
-	test_server = new Guarder(80);
+	test_server.reset(new Guarder(80));
 	ThreadPool::create(8, 1000);
 	test_server->start();
 	test_server->loop();
-	delete test_server;
+
 
 	return 0;
 }

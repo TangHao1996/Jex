@@ -10,6 +10,7 @@ namespace Jex {
 
 class Guarder{
 public:
+	typedef std::shared_ptr<Guarder> ptr;
 	Guarder(int port);
 	~Guarder();
 
