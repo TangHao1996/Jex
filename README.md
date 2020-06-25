@@ -1,2 +1,1 @@
-# Jex
-![image](https://github.com/TangHao1996/Jex/blob/master/Bedlam_icon.png)
+A back-end HTTP server framework based on C++11 and posix.
